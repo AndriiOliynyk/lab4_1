@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Лабораторна робота №4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:        #f5f2ec;
+      --surface:   #ffffff;
+      --border:    #e0d9ce;
+      --text:      #1a1611;
+      --muted:     #7a7168;
+      --accent:    #c8400a;
+      --accent2:   #2d6a4f;
+      --card-bg:   #faf8f4;
+      --shadow:    0 2px 16px rgba(0,0,0,.07);
+      --radius:    14px;
+      --transition: .3s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="dark"] {
+      --bg:        #14120e;
+      --surface:   #1e1b16;
+      --border:    #2e2b24;
+      --text:      #f0ebe2;
+      --muted:     #9c9589;
+      --accent:    #e8622a;
+      --accent2:   #52b788;
+      --card-bg:   #1a1714;
+      --shadow:    0 2px 20px rgba(0,0,0,.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+      backdrop-filter: blur(8px);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -.02em;
+      color: var(--text);
+    }
+    .logo span { color: var(--accent); }
+
+    nav { display: flex; gap: .5rem; align-items: center; }
+    nav a {
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      padding: .4rem .75rem;
+      border-radius: 8px;
+      transition: color var(--transition), background var(--transition);
+    }
+    nav a:hover { color: var(--text); background: var(--border); }
+
+    .theme-btn {
+      width: 44px; height: 26px;
+      border-radius: 13px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      position: relative;
+      transition: background var(--transition), border-color var(--transition);
+      margin-left: .5rem;
+    }
+    .theme-btn::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      transition: transform var(--transition), background var(--transition);
+    }
+    [data-theme="dark"] .theme-btn::after { transform: translateX(18px); }
+    .theme-icon { font-size: 1rem; line-height: 1; }
+
+    .hero {
+      padding: 5rem 2rem 4rem;
+      max-width: 860px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      padding: .3rem .8rem;
+      border-radius: 99px;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.03em;
+      margin-bottom: 1.2rem;
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    section {
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      padding: 0 2rem;
+      width: 100%;
+    }
+    .section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: .75rem;
+    }
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: 2rem;
+      color: var(--text);
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+    .review-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      transition: box-shadow var(--transition), transform var(--transition);
+      animation: fadeUp .5s ease both;
+    }
+    .review-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .review-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .95rem;
+      margin-bottom: .2rem;
+      color: var(--text);
+    }
+    .review-email {
+      font-size: .78rem;
+      color: var(--accent);
+      margin-bottom: .85rem;
+    }
+    .review-body {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .loading-state {
+      display: flex; align-items: center; gap: .75rem;
+      color: var(--muted); font-size: .9rem;
+      padding: 1.5rem 0;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .overlay.active { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.4rem;
+      width: 100%;
+      max-width: 480px;
+      margin: 1rem;
+      transform: translateY(20px) scale(.97);
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 24px 60px rgba(0,0,0,.18);
+    }
+    .overlay.active .modal { transform: translateY(0) scale(1); }
+
+    .modal-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 1.6rem;
+    }
+    .modal-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; }
+    .modal-sub { font-size: .82rem; color: var(--muted); margin-top: .2rem; }
+    .close-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--transition), color var(--transition);
+    }
+    .close-btn:hover { background: var(--border); color: var(--text); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .85rem;
+    }
+    .form-full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: .35rem; }
+    label { font-size: .78rem; font-weight: 500; color: var(--muted); letter-spacing: .03em; }
+    input, textarea {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: .65rem .85rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition), background var(--transition);
+      width: 100%;
+    }
+    input:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 90px; }
+    .submit-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: .85rem;
+      border-radius: 10px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .02em;
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    .submit-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+    .success-msg {
+      text-align: center;
+      padding: 1.5rem 0;
+      color: var(--accent2);
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+    }
+
+    footer {
+      margin-top: auto;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .footer-label {
+      font-family: 'Syne', sans-serif;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .6rem 1.5rem;
+    }
+    .footer-item {
+      display: flex; flex-direction: column; gap: .15rem;
+    }
+    .footer-item-key {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .footer-item-val {
+      font-size: .82rem;
+      color: var(--text);
+      word-break: break-all;
+    }
+    .footer-copy {
+      margin-top: 1.5rem;
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem; right: 1.5rem;
+      background: var(--accent2);
+      color: #fff;
+      padding: .75rem 1.25rem;
+      border-radius: 10px;
+      font-size: .88rem;
+      font-weight: 500;
+      z-index: 300;
+      transform: translateY(60px);
+      opacity: 0;
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .4s ease;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (max-width: 520px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-full { grid-column: 1; }
+      nav a { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">lab<span>4</span>.js</div>
+    <nav>
+      <a href="#reviews">Відгуки</a>
+      <a href="#footer-info">Система</a>
+      <button class="theme-btn" id="themeBtn" title="Перемкнути тему" aria-label="Перемкнути тему"></button>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div class="hero-tag">Лабораторна робота №4</div>
+    <h1>Робота з <em>JavaScript</em></h1>
+    <p>LocalStorage, Fetch API, Event Listeners та робота з датою і часом — все в одному місці.</p>
+  </div>
+
+  <section id="reviews">
+    <div class="section-label">Завдання 2</div>
+    <h2>Відгуки роботодавців</h2>
+    <div id="reviews-container">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        Завантаження відгуків…
+      </div>
+    </div>
+  </section>
+
+  <footer id="footer-info">
+    <div class="footer-inner">
+      <div class="footer-label">Завдання 1 — Системна інформація (localStorage)</div>
+      <div class="footer-grid" id="footerGrid">
+      </div>
+      <p class="footer-copy">Дані зчитані з localStorage · Лабораторна робота №4</p>
+    </div>
+  </footer>
+
+  <div class="overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modalTitle">Зворотній зв'язок</div>
+          <div class="modal-sub">Ми цінуємо вашу думку 💬</div>
+        </div>
+        <button class="close-btn" id="closeBtn" aria-label="Закрити">✕</button>
+      </div>
+
+      <form
+        id="contactForm"
+        action="https://formspree.io/f/mreojzdj"
+        method="POST"
+      >
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Ім'я</label>
+            <input type="text" id="name" name="name" placeholder="Іван Петренко" required />
+          </div>
+          <div class="form-group">
+            <label for="phone">Телефон</label>
+            <input type="tel" id="phone" name="phone" placeholder="+380 XX XXX XX XX" />
+          </div>
+          <div class="form-group form-full">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="ivan@example.com" required />
+          </div>
+          <div class="form-group form-full">
+            <label for="message">Повідомлення</label>
+            <textarea id="message" name="message" placeholder="Ваш відгук або запитання…" required></textarea>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn">Відправити →</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">✓ Повідомлення відправлено!</div>
+
+  <script>
+
+    const html      = document.documentElement;
+    const themeBtn  = document.getElementById('themeBtn');
+
+    function getAutoTheme() {
+      const h = new Date().getHours();
+      return (h >= 7 && h < 21) ? 'light' : 'dark';
+    }
+
+    function applyTheme(theme) {
+      html.dataset.theme = theme;
+      localStorage.setItem('theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('theme');
+    applyTheme(savedTheme || getAutoTheme());
+
+    themeBtn.addEventListener('click', () => {
+      const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    });
+
+
+    const sysInfo = {
+      userAgent:    navigator.userAgent,
+      platform:     navigator.platform,
+      language:     navigator.language,
+      cookieEnabled: String(navigator.cookieEnabled),
+      screenWidth:  String(screen.width),
+      screenHeight: String(screen.height),
+      colorDepth:   String(screen.colorDepth) + ' bit',
+      timezone:     Intl.DateTimeFormat().resolvedOptions().timeZone,
+      online:       String(navigator.onLine),
+      doNotTrack:   navigator.doNotTrack || 'не вказано',
+      cores:        String(navigator.hardwareConcurrency || 'невідомо'),
+      visitedAt:    new Date().toLocaleString('uk-UA'),
+    };
+
+    Object.entries(sysInfo).forEach(([k, v]) => localStorage.setItem(k, v));
+
+    const labels = {
+      userAgent:     'User Agent',
+      platform:      'Платформа',
+      language:      'Мова',
+      cookieEnabled: 'Cookies',
+      screenWidth:   'Ширина екрану',
+      screenHeight:  'Висота екрану',
+      colorDepth:    'Глибина кольору',
+      timezone:      'Часовий пояс',
+      online:        'Онлайн',
+      doNotTrack:    'Do Not Track',
+      cores:         'CPU ядра',
+      visitedAt:     'Час візиту',
+    };
+
+    const grid = document.getElementById('footerGrid');
+    Object.keys(labels).forEach(k => {
+      const val = localStorage.getItem(k) || '—';
+      const el = document.createElement('div');
+      el.className = 'footer-item';
+      el.innerHTML = `<span class="footer-item-key">${labels[k]}</span>
+                      <span class="footer-item-val">${val}</span>`;
+      grid.appendChild(el);
+    });
+
+
+    async function loadReviews() {
+      const container = document.getElementById('reviews-container');
+      try {
+        const res  = await fetch('https://jsonplaceholder.typicode.com/posts/20/comments');
+        const data = await res.json();
+
+        container.innerHTML = '';
+        const grid = document.createElement('div');
+        grid.className = 'reviews-grid';
+
+        data.forEach((comment, i) => {
+          const card = document.createElement('div');
+          card.className = 'review-card';
+          card.style.animationDelay = `${i * 80}ms`;
+          card.innerHTML = `
+            <div class="review-name">${escHtml(comment.name)}</div>
+            <div class="review-email">${escHtml(comment.email)}</div>
+            <div class="review-body">${escHtml(comment.body)}</div>
+          `;
+          grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+      } catch (err) {
+        container.innerHTML = `<p style="color:var(--muted)">Помилка завантаження відгуків: ${err.message}</p>`;
+      }
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    loadReviews();
+
+
+    const overlay     = document.getElementById('overlay');
+    const closeBtn    = document.getElementById('closeBtn');
+    const contactForm = document.getElementById('contactForm');
+    const toast       = document.getElementById('toast');
+
+    // Показати через 60 000 мс
+    let modalTimer = setTimeout(() => {
+      overlay.classList.add('active');
+    }, 60000);
+
+    closeBtn.addEventListener('click', () => {
+      overlay.classList.remove('active');
+    });
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('active');
+    });
+
+    // Відправка форми через Formspree (fetch, щоб не перезавантажувати сторінку)
+    contactForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = contactForm.querySelector('.submit-btn');
+      btn.textContent = 'Відправляємо…';
+      btn.disabled = true;
+
+      try {
+        const formData = new FormData(contactForm);
+        const res = await fetch(contactForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          overlay.classList.remove('active');
+          contactForm.reset();
+          showToast();
+        } else {
+          btn.textContent = 'Помилка. Спробуй ще';
+          btn.disabled = false;
+        }
+      } catch {
+        btn.textContent = 'Помилка мережі';
+        btn.disabled = false;
+      }
+    });
+
+    function showToast() {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // ESC закриває модалку
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') overlay.classList.remove('active');
+    });
+  </script>
+</body>
+</html>
